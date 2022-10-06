@@ -16,14 +16,14 @@ const { ApolloError } = require('apollo-server-errors')
 const resolvers = {
     Query: {
         // get a single user by id
-        user: (_, {ID}) => User.findById(ID),
+        user: (_, args) => User.findById(args.id).clone().catch(err => console.log(err)),
         // get a single message by id
-        message: (_, {ID}) => Message.findById(ID)
+        message: (_, args) => Message.findById(args.id).clone().catch(err => console.log(err))
     },
 
     Mutation: {
         // register user mutation
-        registerUser: async (_, {registerInput: {username, email, password} }) => {
+        registerUser: async (_, {input: {username, email, password} }) => {
             // see if old user exists already with the same email
             const oldUser = await User.findOne({ email })
             
@@ -64,7 +64,7 @@ const resolvers = {
         },
 
         // create message mutation
-        createMessage: async (_, {messageInput: {text, username} }) => {
+        createMessage: async (_, {input: {text, username} }) => {
             // create new message using mongoose
             const newMessage = new Message({
                 text: text,
@@ -86,7 +86,7 @@ const resolvers = {
         },
 
         // log user in mutation
-        logUserIn: async (_, {loginInput: {email, password}}) => {
+        logUserIn: async (_, {input: {email, password}}) => {
             // see if user exists with the email passed in
             const user = await User.findOne({ email })
 
